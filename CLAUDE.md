@@ -11,7 +11,7 @@ O dono do projeto é iniciante: explicar tudo em português simples, com analogi
 ## Stack
 - Python 3.11+ (local do dono: Windows).
 - requests + BeautifulSoup (leitura), PyYAML (config), python-dotenv (.env local), pypdf (PDF).
-- GitHub Actions (cron 11:00 UTC = 8h America/Belem). Memória gravada por commit automático.
+- Roda no PC Windows do dono via Agendador de Tarefas (8h, ou ao ligar o PC). GitHub = só guarda o código.
 - E-mail via SMTP do Gmail com senha de app.
 - Sem banco, servidor, painel, Docker, LLM. Playwright só se indispensável (o dono liberou decidir).
 
@@ -27,7 +27,7 @@ O dono do projeto é iniciante: explicar tudo em português simples, com analogi
 - Simulação (não envia e-mail, não grava memória): `python -m robo.principal --simulacao`
 - Real: `python -m robo.principal`
 
-## Segredos (GitHub Secrets / .env local, NUNCA no código nem em log)
+## Segredos (arquivo .env no PC, NUNCA no código nem em log)
 EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_ADMIN (resumo semanal e alerta de falha geral).
 
 ## Convenções
@@ -39,11 +39,20 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Não inventar URL de site: só entra em sites.yaml o que foi aberto e confirmado.
 
 ## Decisões tomadas
-- Filtro em duas fases: (1) título/resumo indica seleção (`tipos_selecao`); (2) só para itens novos,
-  abre a página/PDF do edital e procura cargos do perfil (`inclusao`).
-- Exclusão em 3 níveis: `bloqueio_total` (estágio: descarta sempre), `bloqueio_titulo`
-  (concurso público: só se estiver no título), `cargos_fora_do_perfil` (nunca descarta sozinho,
-  só tira o cargo da lista do e-mail). Por isso "contabilidade" dentro de cargo financeiro não exclui.
+- Filtro (robo/filtro.py; regras explicadas no topo do palavras_chave.yaml):
+  1. Triagem só com título/resumo da listagem: `tipos_selecao` (ou, se o site tem `pagina_so_de_vagas`,
+     já citar cargo/área). Descarta se título/resumo tem `bloqueio` (estágio, concurso público)
+     ou se o TÍTULO tem `nao_e_abertura` (convocação, resultado, gabarito...). Retificação passa.
+  2. Só para os triados: abre página + até 2 PDFs (robo/edital.py) e procura:
+     `cargos` (nomes de cargo) em qualquer lugar; `areas` (orçamento, RH...) só no título/resumo,
+     e só se o título/resumo não tiver `fora_do_perfil`.
+  Motivos: "estágio"/"concurso público" aparecem no corpo de PSS bons ("estágio não conta como
+  experiência"); "Recursos Humanos"/"Gestão de Pessoas" aparecem no corpo como nome de setor.
+  Assim "contabilidade" em cargo financeiro não exclui, e Contador com "orçamento" não passa.
+- Prazo (robo/prazo.py): âncoras (inscrição, candidatura, envio de currículo) + período/"até" logo depois,
+  ou logo antes (tabela de cronograma). Ignora âncoras de isenção/recurso/resultado. Se as âncoras
+  discordam → None. Data sem ano: ano da referência; se cair >270 dias no passado, ano seguinte.
+- Nível (robo/nivel.py): só expressões completas ("nível superior", não "superior" sozinho).
 - "secretária" virou "secretaria executiva/secretário executivo": sem acento, "secretaria" casaria
   com "Secretaria de Estado de ..." em todo site do governo.
 - "agente administrativo" adicionado (cargo comum no Pará).
@@ -52,7 +61,7 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Primeira execução (memória vazia): um único e-mail com prazos abertos/não identificados; o resto vira "visto".
 - Saúde dos sites em arquivo separado da memória de editais.
 - Resumo semanal (segunda) e alerta "todos os sites falharam" vão para EMAIL_ADMIN, não para a destinatária.
-- Repositório: cicerojuniorngr-create/appsnog (dono precisa deixar PRIVADO antes do primeiro push).
+- Repositório: cicerojuniorngr-create/appsnog (PRIVADO, confirmado), branch main.
 
 - Playwright NÃO adotado por ora: os sites que exigem JS (Portal CR2, Senai/Sesi, SEST SENAT) trazem pouco valor
   e o custo (≈150 MB de navegador, execução lenta) não compensa.
@@ -72,5 +81,8 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 
 ## Status
 - Etapa 1 concluída.
-- Etapa 2: lista em config/sites.yaml testada (11 legíveis, 5 parciais, 14 não lidos daqui dos EUA).
-  AGUARDANDO ok do dono + decisão sobre onde rodar (problema do bloqueio de IP estrangeiro).
+- Etapa 2 concluída: config/sites.yaml testada (11 legíveis, 5 parciais, 14 não lidos daqui dos EUA).
+- Etapa 3 concluída: filtro, prazo, nível, extrator de itens, leitor de PDF; 65 testes.
+  Teste real: Senac (PRS 34/39/40 Assistente de Administração) e Sesc (Auxiliar Administrativo I)
+  detectados com prazo e nível corretos. Sites do Estado (Sipros etc.) ainda não testados: só do PC do dono.
+- Próxima: Etapa 4 (memória, duplicatas, saúde dos sites, modo simulação, robo/principal.py).

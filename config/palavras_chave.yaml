@@ -7,89 +7,127 @@
 #  - Cada item começa com "- " e fica numa linha própria.
 #
 # COMO O ROBÔ DECIDE (resumão):
-#  1) O título/resumo tem que falar de seleção (lista "tipos_selecao").
-#  2) Tem que aparecer pelo menos uma palavra de "inclusao" (no título,
-#     no resumo ou dentro do edital).
-#  3) Se aparecer algo de "bloqueio_total", o edital é descartado inteiro.
-#  4) "cargos_fora_do_perfil" NUNCA descartam o edital sozinhos: só servem
-#     pra não listar esses cargos no e-mail. Assim um "PSS para diversos
-#     cargos" com médico E assistente administrativo continua passando.
+#  1) O título/resumo precisa falar de seleção ("tipos_selecao").
+#     (Sites marcados com pagina_so_de_vagas no sites.yaml, que só listam
+#     vagas, trocam isso por: o título/resumo já cita um cargo ou área.)
+#  2) Se o título/resumo tiver algo de "bloqueio", ou o título tiver algo
+#     de "nao_e_abertura" -> descartado.
+#  3) Passa se:
+#     a) aparecer um nome de CARGO (lista "cargos") no título, no resumo
+#        ou dentro do edital; OU
+#     b) aparecer uma ÁREA/ATIVIDADE (lista "areas") no título ou resumo,
+#        e o título/resumo NÃO tiver nada de "fora_do_perfil".
+#
+# Por que separar cargo de área? Palavras como "recursos humanos" e
+# "orçamento" aparecem em quase todo edital como nome de setor ("entregar
+# documentos na Diretoria de Recursos Humanos"). Então dentro do edital só
+# contam nomes de cargo. Já "fora_do_perfil" serve pra que um edital de
+# Contador que fale em "orçamento" não passe, mas um de Assistente Financeiro
+# que cite "contabilidade" nas tarefas continue passando.
 # =====================================================================
 
-# Fase 1: isso é uma seleção que interessa?
+# Etapa 1: isso é uma seleção que interessa?
 tipos_selecao:
   - processo seletivo simplificado
   - processo seletivo
   - pss
-  - selecao publica
-  - selecao simplificada
-  - contratacao temporaria
-  - contratacao por tempo determinado
+  - seleção pública
+  - seleção simplificada
+  - contratação temporária
+  - contratação por tempo determinado
   - credenciamento
   - cadastro reserva
   - cadastro de reserva
 
-# Fase 2: tem cargo do perfil?
-inclusao:
+# Nomes de cargo: valem em qualquer lugar (título, resumo, edital).
+cargos:
   administrativo:
     - assistente administrativo
     - auxiliar administrativo
-    - tecnico administrativo
+    - técnico administrativo
     - analista administrativo
+    - agente administrativo        # muito comum nos órgãos do Pará
     - apoio administrativo
-    - agente administrativo      # muito comum nos órgãos do Pará
-    - auxiliar de escritorio
-    - secretaria executiva
-    - secretario executivo
+    - assistente de administração  # nome usado pelo Senac
+    - auxiliar de administração
+    - técnico em administração
+    - analista de administração
+    - auxiliar de escritório
+    - secretária executiva         # "secretária" sozinha casaria com "Secretaria de Estado"
+    - secretário executivo
     - recepcionista administrativo
   financeiro:
     - assistente financeiro
     - analista financeiro
-    - tecnico financeiro
+    - técnico financeiro
     - auxiliar financeiro
+  dp_rh:
+    - assistente de rh
+    - analista de rh
+    - técnico em rh
+    - auxiliar de rh
+    - assistente de recursos humanos
+    - analista de recursos humanos
+    - auxiliar de recursos humanos
+    - assistente de departamento pessoal
+    - auxiliar de departamento pessoal
+    - analista de departamento pessoal
+
+# Áreas/atividades: valem só no título ou no resumo da listagem.
+areas:
+  financeiro:
     - contas a pagar
     - contas a receber
     - tesouraria
-    - orcamento
+    - orçamento
     - faturamento
-    - medicao
-    - planejamento orcamentario
+    - medição
+    - planejamento orçamentário
   dp_rh:
     - departamento pessoal
     - folha de pagamento
-    - assistente de rh
-    - analista de rh
-    - tecnico em rh
     - recursos humanos
-    - gestao de pessoas
+    - gestão de pessoas
     - rotinas de pessoal
 
-# Descarta o edital inteiro, mesmo que tenha cargo do perfil.
-bloqueio_total:
-  - estagio
-  - estagiario
-  - estagiarios
+# Descarta se aparecer no título ou no resumo da listagem.
+# (No corpo do edital não: lá é comum "estágio não conta como experiência"
+# e "este processo não é concurso público".)
+bloqueio:
+  - estágio
+  - estagiário
+  - estagiários
+  - concurso público
 
-# Descarta só se aparecer no TÍTULO (no corpo do edital é comum aparecer
-# "este processo não se trata de concurso público").
-bloqueio_titulo:
-  - concurso publico
+# Descarta se aparecer no TÍTULO: são publicações de processos que já
+# andaram (chamada de aprovados, resultado...), não inscrição nova.
+# Retificação NÃO está aqui de propósito: ela pode prorrogar o prazo.
+nao_e_abertura:
+  - convocação
+  - convoca
+  - resultado
+  - gabarito
+  - homologação
+  - homologa
+  - classificação
+  - aprovados
+  - habilitados
 
-# Não descartam o edital: só não aparecem na lista de cargos do e-mail.
-cargos_fora_do_perfil:
+# Só atrapalham quando o edital passou apenas por "areas" (regra 3b).
+fora_do_perfil:
   - contador
   - contabilidade
-  - medico
+  - médico
   - enfermeiro
-  - tecnico de enfermagem
-  - farmaceutico
-  - odontologo
+  - técnico de enfermagem
+  - farmacêutico
+  - odontólogo
   - engenheiro
   - arquiteto
   - ti
-  - tecnologia da informacao
+  - tecnologia da informação
   - motorista
   - professor
   - vigilante
-  - servicos gerais
+  - serviços gerais
   - cozinheiro

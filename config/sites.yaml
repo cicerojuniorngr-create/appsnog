@@ -8,6 +8,8 @@
 #   ativo:    true = o robô visita / false = o robô pula
 #   confirmada: true só quando a página foi aberta e conferida como oficial.
 #               Se false, o robô pula (não visitamos endereço chutado).
+#   pagina_so_de_vagas: true quando a página SÓ lista vagas (títulos sem
+#             "processo seletivo" no nome, ex.: Senac/Sesc). Opcional.
 #   obs:      anotação livre pra gente lembrar o porquê das coisas
 #
 # Para adicionar um site: copie um bloco, mude os campos e rode
@@ -200,6 +202,7 @@ sites:
   - nome: Sesc Pará (trabalhe conosco)
     grupo: sistema_s
     url: https://www.sesc-pa.com.br/processo-seletivo
+    pagina_so_de_vagas: true   # todo item da página é vaga: pula a etapa 1 do filtro
     ativo: true
     confirmada: true
     obs: Lista as vagas abertas com link para a plataforma de inscrição.
@@ -207,6 +210,7 @@ sites:
   - nome: Senac Pará (processos seletivos)
     grupo: sistema_s
     url: https://www.pa.senac.br/prs
+    pagina_so_de_vagas: true   # todo item da página é vaga: pula a etapa 1 do filtro
     ativo: true
     confirmada: true
     obs: Lista os PRS com situação (em andamento, cancelado...).
