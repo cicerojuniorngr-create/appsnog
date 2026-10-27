@@ -31,10 +31,10 @@ sites:
 
   - nome: SESPA
     grupo: estadual
-    url: https://www.sespa.pa.gov.br
+    url: https://www.saude.pa.gov.br/
     ativo: true
-    confirmada: false
-    obs: PSS publicados via Sipros. Bloqueou conexão do exterior.
+    confirmada: true
+    obs: Domínio novo (sespa.pa.gov.br não abre). Abre até do exterior, mas a seção "Editais" é de chamamento/compras; os PSS saem pelo Sipros. O robô lê a página inicial (notícias).
 
   - nome: SEAD
     grupo: estadual

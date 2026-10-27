@@ -61,7 +61,11 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Quase todos os sites do Governo do Pará (.pa.gov.br hospedados na Prodepa, uepa.br, banpara.b.br, sipros)
   DERRUBAM conexões vindas de IP estrangeiro. O ambiente de teste e os runners do GitHub Actions ficam nos EUA.
   Logo, em GitHub Actions o robô NÃO lê SESPA/SEAD/SEDUC/UEPA/Hemopa/Prodepa/Banpará/Sipros/Prefeitura de Belém.
-  Pendente: dono testar do PC (Brasil) com `python -m robo.testar_sites` e decidir onde o robô roda.
+  Confirmado pelo dono: do PC dele (Brasil, sem VPN) o Sipros abre.
+- DECISÃO: o robô roda no PC Windows do dono pelo Agendador de Tarefas (liga todo dia; tarefa configurada
+  para rodar assim que o PC ligar se perdeu o horário das 8h). Segredos ficam no .env do PC.
+  GitHub vira só o "cofre" do código (repo privado). GitHub Actions/commit automático da memória saem do plano.
+- Proteção contra rodar 2x no mesmo dia (PC reiniciado): o robô anota a data da última execução e pula se já rodou hoje.
 
 ## Comandos úteis
 - Testar leitura dos sites: `python -m robo.testar_sites` (ou `python -m robo.testar_sites Senac`)
