@@ -22,6 +22,10 @@ from robo import memoria as mem
 from robo import saude_sites as saude_mod
 from robo.config import PASTA_DADOS, agora, carregar_palavras_chave, carregar_sites, hoje
 from robo.edital import texto_completo_do_edital
+from robo.email_envio import (
+    ErroDeEmail, carregar_credenciais, enviar, montar_alerta_falha_geral, montar_aviso,
+    montar_resumo_semanal,
+)
 from robo.extrator_itens import extrair_itens
 from robo.filtro import avaliar, passa_na_triagem
 from robo.leitor_sites import SiteNaoLido, baixar, pausar_entre_requisicoes
@@ -197,10 +201,15 @@ def main():
     simulacao = argumentos.simulacao
     configurar_log(simulacao)
 
+    credenciais = None
     if not simulacao:
-        # O envio de e-mail entra na Etapa 5. Até lá, só o ensaio é permitido.
-        print("O envio de e-mail ainda não está pronto. Use: python -m robo.principal --simulacao")
-        return 1
+        # Confere o .env ANTES de visitar os sites: melhor falhar em 1 segundo
+        # do que depois de 5 minutos lendo sites.
+        try:
+            credenciais = carregar_credenciais()
+        except ErroDeEmail as erro:
+            log.error("%s", erro)
+            return 1
 
     data_hoje = hoje()
     memoria = mem.carregar()
@@ -213,14 +222,72 @@ def main():
     primeira_execucao = mem.esta_vazia(memoria)
     log.info("Início da execução%s.", " em MODO SIMULAÇÃO" if simulacao else "")
 
-    resultado = executar(carregar_sites(), carregar_palavras_chave(), memoria, data_hoje)
+    sites = carregar_sites()
+    resultado = executar(sites, carregar_palavras_chave(), memoria, data_hoje)
     resumo_pendente = saude_mod.resumo_semanal_pendente(saude, data_hoje)
 
     if simulacao:
         mostrar_resultado(resultado, primeira_execucao, resumo_pendente)
         print("\n(Modo simulação: nenhum e-mail enviado, nada gravado.)")
         return 0
+
+    return finalizar(resultado, memoria, saude, credenciais, data_hoje, primeira_execucao, resumo_pendente)
+
+
+def finalizar(resultado, memoria, saude, credenciais, data_hoje, primeira_execucao, resumo_pendente):
+    """Manda os e-mails e grava tudo. Separado do main() pra ficar legível."""
+    momento = agora()
+    for nome in resultado["sites_lidos"]:
+        saude_mod.registrar_sucesso(saude, nome, momento)
+    for nome, motivo in resultado["falhas"]:
+        saude_mod.registrar_falha(saude, nome, motivo, momento)
+
+    avisar = editais_para_avisar(resultado)
+    if avisar:
+        try:
+            enviar(*montar_aviso(avisar, data_hoje, primeira_execucao),
+                   credenciais["EMAIL_DESTINATARIO"], credenciais)
+            log.info("E-mail de aviso enviado com %d edital(is).", len(avisar))
+        except ErroDeEmail as erro:
+            # NÃO grava a memória nem a execução: assim, na próxima vez que o
+            # robô rodar, esses editais continuam "novos" e o aviso sai de novo.
+            log.error("Aviso NÃO enviado: %s A memória não foi gravada.", erro)
+            saude_mod.salvar(saude)
+            return 1
+
+    if not resultado["sites_lidos"] and resultado["falhas"]:
+        enviar_sem_derrubar(montar_alerta_falha_geral(resultado["falhas"], data_hoje),
+                            credenciais["EMAIL_ADMIN"], credenciais, "alerta de falha geral")
+
+    saude_mod.registrar_execucao(
+        saude, data_hoje, resultado["sites_lidos"], resultado["falhas"], len(avisar)
+    )
+    if resumo_pendente:
+        numeros = saude_mod.numeros_da_semana(saude, data_hoje)
+        if enviar_sem_derrubar(montar_resumo_semanal(numeros, resultado["nao_visitados"], data_hoje),
+                               credenciais["EMAIL_ADMIN"], credenciais, "resumo semanal"):
+            saude_mod.marcar_resumo_enviado(saude, data_hoje)
+
+    esquecidos = mem.limpar_antigos(memoria, data_hoje)
+    mem.salvar(memoria)
+    saude_mod.salvar(saude)
+    log.info(
+        "Fim: %d sites lidos, %d falhas, %d avisados, %d anotados sem aviso, %d esquecidos (>12 meses).",
+        len(resultado["sites_lidos"]), len(resultado["falhas"]), len(avisar),
+        len(resultado["analisados"]) - len(avisar), esquecidos,
+    )
     return 0
+
+
+def enviar_sem_derrubar(email_montado, destinatario, credenciais, descricao):
+    """Para e-mails ao administrador: se falhar, registra e segue."""
+    try:
+        enviar(*email_montado, destinatario, credenciais)
+        log.info("E-mail de %s enviado.", descricao)
+        return True
+    except ErroDeEmail as erro:
+        log.error("E-mail de %s NÃO enviado: %s", descricao, erro)
+        return False
 
 
 if __name__ == "__main__":

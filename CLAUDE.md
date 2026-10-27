@@ -19,7 +19,7 @@ O dono do projeto é iniciante: explicar tudo em português simples, com analogi
 - `robo/` código, um arquivo por função (leitura, extração, filtro, prazo, nível, memória, e-mail).
 - `config/sites.yaml` lista de sites; `config/palavras_chave.yaml` filtros.
 - `dados/editais_vistos.json` memória; `dados/saude_sites.json` saúde dos sites; `dados/log_execucoes.txt`.
-- `tests/` pytest (filtro, prazo, nível, memória/fluxo com internet falsa).
+- `tests/` pytest (filtro, prazo, nível, memória/fluxo com internet falsa, e-mail com Gmail falso).
 
 ## Como rodar
 - Instalar: `pip install -r requirements-dev.txt`
@@ -86,6 +86,8 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Proteção contra rodar 2x no mesmo dia (PC reiniciado): o robô anota a data da última execução e pula se já rodou hoje.
 
 ## Comandos úteis
+- Prévia dos e-mails (não envia): `python -m robo.enviar_teste --previa`
+- E-mail de teste (vai p/ EMAIL_ADMIN): `python -m robo.enviar_teste` ou `--para outro@x.com`
 - Testar leitura dos sites: `python -m robo.testar_sites` (ou `python -m robo.testar_sites Senac`)
 
 ## Status
@@ -97,4 +99,10 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Etapa 4 concluída: robo/memoria.py, robo/saude_sites.py, robo/principal.py (--simulacao, --forcar); 74 testes.
   Modo real ainda BLOQUEADO em principal.main() até a Etapa 5 (e-mail), pra não anotar como "avisado" sem enviar.
   Simulação real daqui: ~4 min, 14 sites lidos, 0 avisos (todos os editais do perfil com prazo vencido).
-- Próxima: Etapa 5 (e-mail de aviso, resumo semanal, alerta de falha geral).
+- Etapa 5 (código) concluída: robo/email_envio.py (3 e-mails, SMTP_SSL 465), robo/enviar_teste.py
+  (--previa gera HTML em dados/; envio vai p/ EMAIL_ADMIN ou --para; RECUSA EMAIL_DESTINATARIO);
+  principal.finalizar(): se o aviso falhar, NÃO grava memória nem registra execução (tenta de novo).
+  89 testes. Falta: teste de envio real no PC do dono (senha de app só existe no .env de lá).
+- Remetente provisório: conta Gmail pessoal do dono (avisado do risco da senha de app; trocar quando
+  criar conta exclusiva). Endereços ficam SÓ no .env do PC, nunca no repositório.
+- Próxima: Etapa 6 (instalação no Windows, .env, senha de app, Agendador de Tarefas, README).

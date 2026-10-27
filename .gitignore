@@ -12,3 +12,5 @@ venv/
 dados/*.json
 dados/*.tmp
 dados/*.txt
+dados/*.html
+dados/*.png
