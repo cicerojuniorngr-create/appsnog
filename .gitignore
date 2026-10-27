@@ -8,5 +8,7 @@ __pycache__/
 .venv/
 venv/
 
-# Arquivos temporários de teste
-dados/simulacao_*
+# Memória, saúde e log do robô: ficam só no PC onde ele roda
+dados/*.json
+dados/*.tmp
+dados/*.txt

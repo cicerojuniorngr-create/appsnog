@@ -19,7 +19,7 @@ O dono do projeto é iniciante: explicar tudo em português simples, com analogi
 - `robo/` código, um arquivo por função (leitura, extração, filtro, prazo, nível, memória, e-mail).
 - `config/sites.yaml` lista de sites; `config/palavras_chave.yaml` filtros.
 - `dados/editais_vistos.json` memória; `dados/saude_sites.json` saúde dos sites; `dados/log_execucoes.txt`.
-- `tests/` pytest (filtro, prazo, nível).
+- `tests/` pytest (filtro, prazo, nível, memória/fluxo com internet falsa).
 
 ## Como rodar
 - Instalar: `pip install -r requirements-dev.txt`
@@ -59,7 +59,16 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Comparação por palavra inteira, sem acento e sem maiúscula.
 - Duplicata: chave 1 = link+título normalizados; chave 2 = número/ano do edital + órgão.
 - Primeira execução (memória vazia): um único e-mail com prazos abertos/não identificados; o resto vira "visto".
-- Saúde dos sites em arquivo separado da memória de editais.
+- Saúde dos sites em arquivo separado da memória de editais (dados/saude_sites.json): por site última
+  leitura ok/falha + histórico das últimas 60 execuções + data do último resumo semanal.
+- Memória: dict editais[id] com titulo, orgao, link, visto_em, prazo, niveis, cargos, relevante, avisado,
+  chave_duplicata. Itens triados e irrelevantes também são anotados (evita reabrir todo dia).
+  Itens cujo edital não abriu e que o título não confirma NÃO são anotados (tenta no dia seguinte).
+- Duplicata: número/ano do edital (no título) + prazo final. Sem número ou sem prazo → sem checagem.
+- Máximo de 15 editais abertos por site por dia (o resto fica pra amanhã).
+- Fuso: UTC-3 fixo (Belém não tem horário de verão; evita depender de tzdata no Windows).
+- Resumo semanal: na primeira execução de cada semana ISO (segunda, ou depois se o PC ficou desligado).
+- dados/*.json e *.txt estão no .gitignore: memória fica só no PC.
 - Resumo semanal (segunda) e alerta "todos os sites falharam" vão para EMAIL_ADMIN, não para a destinatária.
 - Repositório: cicerojuniorngr-create/appsnog (PRIVADO, confirmado), branch main.
 
@@ -85,4 +94,7 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 - Etapa 3 concluída: filtro, prazo, nível, extrator de itens, leitor de PDF; 65 testes.
   Teste real: Senac (PRS 34/39/40 Assistente de Administração) e Sesc (Auxiliar Administrativo I)
   detectados com prazo e nível corretos. Sites do Estado (Sipros etc.) ainda não testados: só do PC do dono.
-- Próxima: Etapa 4 (memória, duplicatas, saúde dos sites, modo simulação, robo/principal.py).
+- Etapa 4 concluída: robo/memoria.py, robo/saude_sites.py, robo/principal.py (--simulacao, --forcar); 74 testes.
+  Modo real ainda BLOQUEADO em principal.main() até a Etapa 5 (e-mail), pra não anotar como "avisado" sem enviar.
+  Simulação real daqui: ~4 min, 14 sites lidos, 0 avisos (todos os editais do perfil com prazo vencido).
+- Próxima: Etapa 5 (e-mail de aviso, resumo semanal, alerta de falha geral).
