@@ -68,5 +68,5 @@ EMAIL_REMETENTE, SENHA_APP_EMAIL, EMAIL_DESTINATARIO (avisos de edital), EMAIL_A
 
 ## Status
 - Etapa 1 concluída.
-- Etapa 2: lista em config/sites.yaml testada (12 legíveis, 4 parciais, 14 não lidos daqui dos EUA).
+- Etapa 2: lista em config/sites.yaml testada (11 legíveis, 5 parciais, 14 não lidos daqui dos EUA).
   AGUARDANDO ok do dono + decisão sobre onde rodar (problema do bloqueio de IP estrangeiro).
