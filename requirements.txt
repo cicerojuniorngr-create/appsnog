@@ -1,0 +1,10 @@
+# Baixa as páginas dos sites (com timeout e User-Agent).
+requests>=2.31
+# Lê o HTML e acha os links/títulos dentro dele.
+beautifulsoup4>=4.12
+# Lê os arquivos de configuração .yaml que você edita.
+PyYAML>=6.0
+# Lê o arquivo .env quando você roda no seu computador.
+python-dotenv>=1.0
+# Extrai o texto de editais em PDF para achar prazo e cargos.
+pypdf>=4.0

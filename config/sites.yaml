@@ -1,0 +1,240 @@
+# =====================================================================
+# LISTA DE SITES QUE O ROBÔ VISITA
+# =====================================================================
+# Cada site é um bloco começando com "- nome:". Campos:
+#   nome:     nome curto do órgão (aparece no e-mail)
+#   grupo:    estadual | municipal | camara | banca | sistema_s
+#   url:      página onde saem os editais/seleções
+#   ativo:    true = o robô visita / false = o robô pula
+#   confirmada: true só quando a página foi aberta e conferida como oficial.
+#               Se false, o robô pula (não visitamos endereço chutado).
+#   obs:      anotação livre pra gente lembrar o porquê das coisas
+#
+# Para adicionar um site: copie um bloco, mude os campos e rode
+#   python -m robo.testar_sites
+# para ver se o robô consegue ler.
+# =====================================================================
+
+sites:
+
+  # ---------------- ÓRGÃOS E EMPRESAS ESTADUAIS ----------------
+  # ATENÇÃO: quase todos os sites .pa.gov.br derrubam conexões vindas de
+  # fora do Brasil. Os testes daqui (servidor nos EUA) não conseguiram abrir.
+  # Precisam ser testados de um computador no Brasil.
+
+  - nome: Sipros (portal de PSS do Governo do Pará)
+    grupo: estadual
+    url: https://www.sipros.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Portal central onde SESPA, Santa Casa, Prodepa, Seaf, Iasep, Parápaz etc. publicam PSS. Bloqueou conexão do exterior.
+
+  - nome: SESPA
+    grupo: estadual
+    url: https://www.sespa.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: PSS publicados via Sipros. Bloqueou conexão do exterior.
+
+  - nome: SEAD
+    grupo: estadual
+    url: https://www.sead.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Bloqueou conexão do exterior.
+
+  - nome: SEDUC
+    grupo: estadual
+    url: https://pss.seduc.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Portal de PSS da Seduc (citado nos editais). Bloqueou conexão do exterior.
+
+  - nome: UEPA
+    grupo: estadual
+    url: https://www.uepa.br
+    ativo: true
+    confirmada: false
+    obs: Editais em uepa.br/sites/default/files/editais/. Bloqueou conexão do exterior.
+
+  - nome: Hemopa
+    grupo: estadual
+    url: https://www.hemopa.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Bloqueou conexão do exterior.
+
+  - nome: Santa Casa do Pará
+    grupo: estadual
+    url: https://www.santacasa.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Proteção anti-robô (Cloudflare "Just a moment"). PSS também saem pelo Sipros.
+
+  - nome: Prodepa
+    grupo: estadual
+    url: https://www.prodepa.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: PSS via Sipros. Bloqueou conexão do exterior.
+
+  - nome: Banpará
+    grupo: estadual
+    url: https://www.banpara.b.br
+    ativo: true
+    confirmada: false
+    obs: Bloqueou conexão do exterior. Costuma fazer concurso (fora do MVP), não PSS.
+
+  - nome: Cosanpa
+    grupo: estadual
+    url: https://www.cosanpa.pa.gov.br/?post_type=noticias
+    ativo: true
+    confirmada: true
+    obs: Sem página própria de seleção; o robô lê a lista de notícias e filtra.
+
+  - nome: ALEPA
+    grupo: estadual
+    url: https://www.alepa.pa.gov.br/Comunicacao/Noticias
+    ativo: true
+    confirmada: true
+    obs: Sem página própria de seleção; o robô lê as notícias e filtra.
+
+  - nome: Fundação Papa João XXIII (Funpapa)
+    grupo: municipal
+    url: https://www.funpapa.belem.pa.gov.br
+    ativo: false
+    confirmada: false
+    obs: Domínio não respondeu. É fundação da Prefeitura de Belém (não do Estado). URL A CONFIRMAR.
+
+  # ---------------- PREFEITURAS ----------------
+  - nome: Prefeitura de Belém
+    grupo: municipal
+    url: https://www.belem.pa.gov.br
+    ativo: true
+    confirmada: false
+    obs: Bloqueou conexão do exterior.
+
+  - nome: Prefeitura de Ananindeua (notícias)
+    grupo: municipal
+    url: https://ananews.com.br/noticias
+    ativo: true
+    confirmada: true
+    obs: O portal da prefeitura (ananindeua.pa.gov.br) aponta para este site de notícias. Sem página de seleção.
+
+  - nome: Prefeitura de Marituba (notícias)
+    grupo: municipal
+    url: https://marituba.pa.gov.br/site/
+    ativo: true
+    confirmada: true
+    obs: Página de concursos/PSS fica no Portal CR2, que só abre com navegador automatizado e hoje só tem "não houve publicações".
+
+  - nome: Prefeitura de Benevides (editais)
+    grupo: municipal
+    url: https://www.benevides.pa.gov.br/editais
+    ativo: true
+    confirmada: true
+    obs: Mistura editais de vários tipos; o filtro separa.
+
+  - nome: Prefeitura de Santa Bárbara do Pará
+    grupo: municipal
+    url: https://santabarbara.pa.gov.br/
+    ativo: true
+    confirmada: true
+    obs: Editais de seleção aparecem como posts na página inicial.
+
+  - nome: Prefeitura de Santa Izabel do Pará
+    grupo: municipal
+    url: https://santaizabel.pa.gov.br/
+    ativo: true
+    confirmada: true
+    obs: Instável (1º teste derrubou, 2º abriu). Editais de PSS aparecem como posts na página inicial.
+
+  # ---------------- CÂMARAS MUNICIPAIS ----------------
+  - nome: Câmara de Belém
+    grupo: camara
+    url: https://www.cmb.pa.gov.br
+    ativo: false
+    confirmada: true
+    obs: Tela anti-robô ("Security Check Required") em 2 de 3 testes. Não burlamos.
+
+  - nome: Câmara de Marituba
+    grupo: camara
+    url: https://camaramarituba.pa.gov.br
+    ativo: false
+    confirmada: true
+    obs: Tela de verificação anti-robô ("Security Check Required"). Não burlamos.
+
+  - nome: Câmara de Benevides
+    grupo: camara
+    url: https://www.benevides.pa.leg.br
+    ativo: true
+    confirmada: true
+    obs: Site oficial abre, mas não tem seção de seleção; lê a página inicial.
+
+  # Câmaras de Ananindeua, Santa Bárbara e Santa Izabel: URL A CONFIRMAR
+  # (nenhum domínio testado respondeu).
+
+  # ---------------- BANCAS ----------------
+  - nome: FADESP (concursos abertos)
+    grupo: banca
+    url: https://portalfadesp.org.br/?page_id=33858
+    ativo: true
+    confirmada: true
+    obs: Lista de seleções abertas.
+
+  - nome: FADESP (novos)
+    grupo: banca
+    url: https://portalfadesp.org.br/?page_id=33856
+    ativo: true
+    confirmada: true
+    obs: Lista de seleções recém-anunciadas.
+
+  - nome: Fundação CETAP
+    grupo: banca
+    url: https://fundacaocetap.com.br
+    ativo: false
+    confirmada: false
+    obs: Proteção anti-robô (Cloudflare). Banca ativa no Pará (Banpará, ALEPA, Benevides).
+
+  # ---------------- SISTEMA S ----------------
+  - nome: Sesc Pará (trabalhe conosco)
+    grupo: sistema_s
+    url: https://www.sesc-pa.com.br/processo-seletivo
+    ativo: true
+    confirmada: true
+    obs: Lista as vagas abertas com link para a plataforma de inscrição.
+
+  - nome: Senac Pará (processos seletivos)
+    grupo: sistema_s
+    url: https://www.pa.senac.br/prs
+    ativo: true
+    confirmada: true
+    obs: Lista os PRS com situação (em andamento, cancelado...).
+
+  - nome: Senai Pará (trabalhe conosco)
+    grupo: sistema_s
+    url: https://www.senaipa.org.br/trabalhe-conosco
+    ativo: true
+    confirmada: true
+    obs: Página abre, mas a lista de vagas depende de JavaScript (veio vazia até no navegador automatizado).
+
+  - nome: Sesi Pará (trabalhe conosco)
+    grupo: sistema_s
+    url: https://www.sesipa.org.br/trabalhe-conosco
+    ativo: true
+    confirmada: true
+    obs: Mesmo modelo do Senai; lista veio vazia no teste.
+
+  - nome: SEST SENAT
+    grupo: sistema_s
+    url: https://www.sestsenat.org.br
+    ativo: false
+    confirmada: true
+    obs: Site nacional feito todo em JavaScript; nem o navegador automatizado carregou a página de vagas.
+
+  - nome: Sebrae Pará
+    grupo: sistema_s
+    url: https://sebrae.com.br/pa/empreendedores
+    ativo: false
+    confirmada: false
+    obs: Portal abre, mas não achei página de seleções do Pará. Seleções saem por bancas terceirizadas. URL A CONFIRMAR.

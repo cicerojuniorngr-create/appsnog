@@ -1,0 +1,12 @@
+# Segredos: NUNCA sobem pro GitHub
+.env
+
+# Lixo do Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Arquivos temporários de teste
+dados/simulacao_*

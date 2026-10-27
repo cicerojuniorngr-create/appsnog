@@ -1,0 +1,95 @@
+# =====================================================================
+# PALAVRAS-CHAVE DO ROBÔ
+# =====================================================================
+# Pode editar à vontade. Regras:
+#  - Maiúscula/minúscula e acento NÃO importam ("Orçamento" = "orcamento").
+#  - A comparação é por palavra inteira: "TI" não casa com "aTIvidades".
+#  - Cada item começa com "- " e fica numa linha própria.
+#
+# COMO O ROBÔ DECIDE (resumão):
+#  1) O título/resumo tem que falar de seleção (lista "tipos_selecao").
+#  2) Tem que aparecer pelo menos uma palavra de "inclusao" (no título,
+#     no resumo ou dentro do edital).
+#  3) Se aparecer algo de "bloqueio_total", o edital é descartado inteiro.
+#  4) "cargos_fora_do_perfil" NUNCA descartam o edital sozinhos: só servem
+#     pra não listar esses cargos no e-mail. Assim um "PSS para diversos
+#     cargos" com médico E assistente administrativo continua passando.
+# =====================================================================
+
+# Fase 1: isso é uma seleção que interessa?
+tipos_selecao:
+  - processo seletivo simplificado
+  - processo seletivo
+  - pss
+  - selecao publica
+  - selecao simplificada
+  - contratacao temporaria
+  - contratacao por tempo determinado
+  - credenciamento
+  - cadastro reserva
+  - cadastro de reserva
+
+# Fase 2: tem cargo do perfil?
+inclusao:
+  administrativo:
+    - assistente administrativo
+    - auxiliar administrativo
+    - tecnico administrativo
+    - analista administrativo
+    - apoio administrativo
+    - agente administrativo      # muito comum nos órgãos do Pará
+    - auxiliar de escritorio
+    - secretaria executiva
+    - secretario executivo
+    - recepcionista administrativo
+  financeiro:
+    - assistente financeiro
+    - analista financeiro
+    - tecnico financeiro
+    - auxiliar financeiro
+    - contas a pagar
+    - contas a receber
+    - tesouraria
+    - orcamento
+    - faturamento
+    - medicao
+    - planejamento orcamentario
+  dp_rh:
+    - departamento pessoal
+    - folha de pagamento
+    - assistente de rh
+    - analista de rh
+    - tecnico em rh
+    - recursos humanos
+    - gestao de pessoas
+    - rotinas de pessoal
+
+# Descarta o edital inteiro, mesmo que tenha cargo do perfil.
+bloqueio_total:
+  - estagio
+  - estagiario
+  - estagiarios
+
+# Descarta só se aparecer no TÍTULO (no corpo do edital é comum aparecer
+# "este processo não se trata de concurso público").
+bloqueio_titulo:
+  - concurso publico
+
+# Não descartam o edital: só não aparecem na lista de cargos do e-mail.
+cargos_fora_do_perfil:
+  - contador
+  - contabilidade
+  - medico
+  - enfermeiro
+  - tecnico de enfermagem
+  - farmaceutico
+  - odontologo
+  - engenheiro
+  - arquiteto
+  - ti
+  - tecnologia da informacao
+  - motorista
+  - professor
+  - vigilante
+  - servicos gerais
+  - cozinheiro

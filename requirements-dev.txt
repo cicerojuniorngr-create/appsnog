@@ -1,0 +1,3 @@
+# Só para quem desenvolve: roda os testes automáticos. O robô não precisa disso.
+-r requirements.txt
+pytest>=8.0
